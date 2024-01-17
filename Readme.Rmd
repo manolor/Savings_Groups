@@ -1,3 +1,407 @@
-## Readme 
+####
 
-Repositorio de codigos asociados al articulo grupos de ahorro
+List of code used in the paper
+Listado de codigos del articulo
+
+
+#### DAta analysis####
+
+## Save Research documents resume 2022
+# Import text data
+library(tm)
+docs <- Corpus(DirSource("C:/Users/LENOVO/Downloads/Topic Modeling/Articulo", encoding = "UTF-8"))
+
+print(docs)
+inspect(docs[[50]])
+
+
+# creating a function to remove different symbols
+to_space <- content_transformer(function(x, pattern)
+{ 
+  return (gsub(pattern, " ", x))
+}
+)
+# removing unwanted symbols
+docs <- tm_map(docs, to_space, ":")
+docs <- tm_map(docs, to_space, "-")
+docs <- tm_map(docs, to_space, "'")
+docs <- tm_map(docs, to_space, "’")
+docs <- tm_map(docs, to_space, '"')
+docs <- tm_map(docs, to_space, ";")
+# removing punctuation
+docs <- tm_map(docs, removePunctuation)
+# transforming to lower case
+docs <- tm_map(docs, content_transformer(tolower))
+# removing numbers
+docs <- tm_map(docs, removeNumbers)
+# removing stop words
+
+Palabras=c("among", "area", "base", "distinct", "factor",
+           "focus", "find", "finding", "year", "show",
+           "include", "low", "level", "however",
+           "datum", "non", "control", "district")
+docs <- tm_map(docs, removeWords, stopwords())
+doc=tm_map(docs, removeWords, Palabras)
+# removing white spaces
+docs <- tm_map(docs, stripWhitespace)
+
+
+
+# inspecting
+inspect(docs[[1]])
+
+
+
+# saving stemmed docs to new_variable
+library(SnowballC)
+stem_docs <- tm_map(docs, stemDocument)
+#inspect(stem_docs[[1]])
+
+
+####Lemmatization####
+library(textstem)  # function lemmatize_strings()
+# Not in this case, we will use tm directly
+library(lexicon)
+docs <- tm_map(docs, lemmatize_strings)
+inspect(docs[1])
+#  Lemmatize a Vector of Words
+library(textstem)
+
+
+
+
+
+
+
+
+
+
+# removing unwanted words
+docs <- tm_map(docs, content_transformer(gsub), pattern = " can ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " part ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " important ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " meaning ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " thus ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " understand ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " set ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " one ", replacement =" ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " provides ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " useful ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " used ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " help ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " may ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " ie ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " us ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " also ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " study ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " vslas ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " vsla ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " datum ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " find ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " good ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " level ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " base ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " result ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " paper", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " sgs", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " control ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " use ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " model ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " among ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " report ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = "sg", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " sgs ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " approach ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " fund ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " sample ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " case", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " silc", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " respondent ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " finding ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " show ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " s ", replacement = " ")
+docs <- tm_map(docs, content_transformer(gsub), pattern = " cb ", replacement = " ")
+
+
+
+
+
+
+
+
+# inspecting
+inspect(docs[[50]])
+
+
+#Creating Term Document Matrix
+dtm <- DocumentTermMatrix(docs)
+inspect(dtm)
+
+# Palabras frecuentes minimo 45 veces
+findFreqTerms(dtm,
+              lowfreq = 50,
+              highfreq = Inf)
+
+
+
+#Performing Text Analysis
+freq <- colSums(as.matrix(dtm))
+length(freq)
+
+
+# creating sorted order according to the freq
+ord <- order(freq, decreasing = TRUE)
+# inspecting most frequently occurring terms
+freq[head(ord)]
+
+
+# inspecting less frequently occurring terms
+freq[tail(ord)]
+
+
+
+# removing less frequently occurring words
+dtmr <- DocumentTermMatrix(docs,
+                           control = list(wordLengths = c(2, 20),
+                     bounds = list(global = c (3, Inf))
+                    )
+)
+inspect(dtmr)
+
+
+##### Term frequency–inverse document frequency #####
+library(tm)
+MatrizTemas=DocumentTermMatrix(docs,
+                            control = list(weighting =
+                       function(x)
+                           weightTfIdf(x, normalize =FALSE)
+                            )
+)
+MatrizTemas
+inspect(MatrizTemas)
+
+##### GRaph Bigram, Trigram#####
+library(dplyr)
+library(tidytext)
+library(tm)
+# create database with docs
+# Crear base de datos
+Database=data.frame(text=sapply(docs, as.character),
+                    stringsAsFactors = F)
+
+Bigram=Database%>%
+  unnest_tokens(bigram, text, token="ngrams", n=2)
+Bigram
+# Contar las frecuencias bigram
+Frec=Bigram%>%
+  count(bigram, sort=T)
+
+library(tidytext)  # Mineria de texto
+library(dplyr) # Para poner texto en formato tidy text
+library(igraph) # Usada para graficar relaciones
+library(tidyr)  # para datos de textos de tipo tidy
+library(ggraph) # para crear grafica de redes
+#Bigrama separada y mover stopwords
+Separacion=Bigram%>%
+  separate(bigram, c("word1", "word2"), sep=" ")
+
+# Crear conteo de bigram
+Conteo_bigram=Separacion%>%
+  count(word1, word2, sort=T)
+Conteo_bigram
+
+## Crear grafica
+# Usar palabras con frecuencia mas de 5 para ver relacion
+Bigram_graf=Conteo_bigram%>%
+  filter(n>10)
+graf_Dataframe()
+
+
+Bigram_graf # Muestra las relaciones entre palabras
+
+# Crear la grafica basada en la relacion
+set.seed(2020)
+ggraph(Bigram_graf, layout = "fr")+
+  geom_edge_link()+
+  geom_node_point()+
+  geom_node_text(aes(label=name, vjust=1, hjust=1))
+
+ggplot(head(Frec,15), aes(reorder(bigram,n), n)) +
+  geom_bar(stat = "identity",  fill="#000099") +
+  coord_flip() +
+  xlab(" ") + ylab(" ") +
+  ggtitle(" ")
+
+
+
+
+
+
+##### Continue of analysis####
+
+# frequency after removal
+freqr <- colSums(as.matrix(dtmr))
+# length after removal
+length(freqr)
+
+
+# creating sorted order according to the freq
+ordr <- order(freqr, decreasing = TRUE)
+# inspecting most frequently occurring terms
+freqr[head(ordr)]
+
+
+# inspecting less frequently occurring terms
+freqr[tail(ordr)]
+
+
+#list of most frequent terms
+findFreqTerms(dtmr, lowfreq = 5)
+
+
+#finding correlations
+findAssocs(dtmr, "group", 0.2)
+
+findAssocs(dtmr, "impact", 0.3)
+
+
+
+# histogram
+wf = data.frame(term = names(freqr), occurrences = freqr)
+library(ggplot2)
+library(tidyverse)
+library(dplyr)
+histograma <- ggplot(subset(wf, freqr >100), 
+                     aes(term, occurrences)) +
+  geom_bar(stat = "identity", fill="#000099", colour="#FF9999") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  coord_flip()
+print(histograma)
+
+# histograma
+library(scales)  # para comma format
+library(dplyr)
+
+head(wf)
+ggplot(subset(wf, freqr >70 ), 
+       aes((term), occurrences)) +
+  geom_col(fill="blue") +
+  scale_y_continuous(labels = comma_format())+
+  coord_flip()+
+  labs(title=paste0("Palabras mas frecuentes"),
+       x="Palabras", y="Cantidad de veces de uso")
+
+
+
+
+
+
+library(wordcloud)
+wordcloud(names(freqr), freqr, min.freq = 70, 
+          max.words=200, random.order=F, rot.per=0.35,
+          color=brewer.pal(8, "Dark2"))
+
+
+
+##### Find topic number ####
+# with document term matrix
+library(ldatuning)
+# dtmr is our document term matrix
+library(topicmodels)
+Optimal_topic=FindTopicsNumber(dtmr, 
+                               topics = 2:15, 
+                               metrics = c("Deveaud2014", "Griffiths2004", "CaoJuan2009", "Arun2010"),
+                               method = "Gibbs",
+                               control = list(seed = 77),
+                               mc.cores = 2L, 
+                               verbose = TRUE)
+
+# Graph to see number of topic
+FindTopicsNumber_plot(Optimal_topic)
+
+
+
+#### topic modeling####
+
+
+library(topicmodels)
+
+# Start with the Document term matrix created
+#dtmr
+dtmr
+
+# Considerar los que tienen valor superior a cero
+SumaFila=apply(dtmr, 1, sum)
+Sin_cero<- dtmr[SumaFila> 0, ]
+
+
+# set a seed so that the output of the model is predictable
+ap_lda <- LDA(Sin_cero, k = 5, control = list(seed = 1234))
+ap_lda
+
+
+#Word-topic probabilities
+library(tidytext)
+ap_topics <- tidy(ap_lda, matrix = "beta")
+ap_topics
+
+
+
+library(ggplot2)
+library(dplyr)
+
+ap_top_terms <- ap_topics %>%
+  group_by(topic) %>%
+  slice_max(beta, n = 10) %>% 
+  ungroup() %>%
+  arrange(topic, -beta)
+
+
+ap_top_terms %>%
+  mutate(term = reorder_within(term, beta, topic)) %>%
+  ggplot(aes(beta, term, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = "free") +
+  scale_y_reordered()+
+  labs(title=paste0("Topicos identificados"),
+     x="Valores de Beta", y="Palabra")
+
+
+
+##### Give names to topic#####
+library(topicmodels)
+library(lda)
+
+
+#####Post LDA analysis#####
+ResultLDA <- posterior(ap_lda)
+theta <- ResultLDA$topics
+beta <-ResultLDA$terms
+# reset topicnames
+topicNames <- apply(terms(ap_lda, 6), 2, paste, collapse = " ")
+topicNames
+
+# nombres de los topicos
+Nombre_topico <- apply(lda::top.topic.words(beta, 6, by.score = T),
+                    2, paste, collapse = " ")
+
+# Cuales son los topicos probables en las colecciones
+# # mean probabilities over all paragraphs
+Porcentaje_topicos <- colSums(theta) / nDocs(dtmr) 
+# assign the topic names we created before
+names(Porcentaje_topicos) <- Nombre_topico    
+# show summed proportions in decreased order
+sort(Porcentaje_topicos, decreasing = TRUE) 
+
+
+
+# Segonde approche _____________ Rechazado
+#Cant_primer_topico <- rep(0, 6)
+#names(Cant_primer_topico) <- topicNames
+#for (i in 1:nDocs(dtmr)) {
+ # topicsPerDoc <- theta[i, ] # select topic distribution for document i
+  # get first element position from ordered list
+  #primaryTopic <- order(topicsPerDoc, decreasing = TRUE)[1] 
+  #Cant_primer_topico[primaryTopic] <- Cant_primer_topico[primaryTopic] + 1
+#}
+#sort(Cant_primer_topico, decreasing = TRUE)
